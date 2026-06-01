@@ -1,6 +1,9 @@
 {
   "owner": "logos-co",
-  "osOptions": ["ubuntu-latest", "macos-latest"],
+  "osOptions": [
+    "ubuntu-latest",
+    "macos-latest"
+  ],
   "defaultOs": "ubuntu-latest",
   "repos": [
     {
@@ -29,11 +32,18 @@
       ]
     },
     {
+      "name": "logos-basecamp",
+      "label": "Logos Basecamp",
+      "tutorials": [
+        "Installing Modules Through the Basecamp Package Manager"
+      ]
+    },
+    {
       "name": "logos-package-manager",
       "label": "Package Manager",
       "tutorials": [
-        "Managing Local Packages with lgpm",
-        "Installing a Real Module with lgpm"
+        "Installing a Real Module with lgpm",
+        "Managing Local Packages with lgpm"
       ]
     },
     {
@@ -58,7 +68,9 @@
         "Rendering, reports, and failures",
         "Chaining specs and cleaning the output tree",
         "Combined reports and release pinning",
-        "The rest of the spec format: binary files, comparison, and Logos hooks"
+        "The rest of the spec format: binary files, comparison, and Logos hooks",
+        "Automating a repo's doc-tests with a run.sh",
+        "Running doc-tests in CI and publishing reports to GitHub Pages"
       ]
     }
   ]
