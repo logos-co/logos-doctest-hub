@@ -36,6 +36,29 @@ Edit [`repos.json`](repos.json):
 
 After merging, the hub site updates on the next push to `main`.
 
+## Refreshing the manifest
+
+When you add, rename, or remove `*.test.yaml` specs — or change which specs CI passes to
+`doctest run --report` — refresh the tutorial list instead of editing it by hand:
+
+```bash
+# From logos-doctest-hub/
+python3 refresh-repos.py              # update repos.json
+./bin/refresh-repos --dry-run         # preview changes only
+python3 refresh-repos.py -v           # verbose (workflow + spec paths)
+python3 refresh-repos.py --workspace /path/to/logos-workspace
+```
+
+The script reads each repo already listed in `repos.json`, finds its GitHub Actions
+workflow that publishes doctest reports, resolves the specs passed to `--report`
+(including `requires:` chains), and updates each repo's `tutorials` array with the
+exact `name:` values from those specs.
+
+**Requires:** Python 3 and PyYAML (`pip install pyyaml`).
+
+New repos are **not** auto-discovered — add `name` and `label` to `repos.json` manually,
+then run the refresh tool to populate `tutorials`.
+
 ## Related
 
 - [`logos-doctest`](../logos-doctest/) — the doc-test runner and HTML report generator
