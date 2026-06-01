@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logos Doc-Test Reports</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --border: #2d3a4d;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --active-bg: #1e3a5f;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font: 14px/1.45 system-ui, -apple-system, Segoe UI, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      flex-shrink: 0;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    header .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .os-toggle {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .os-toggle button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .os-toggle button.active {
+      background: var(--accent);
+      color: #fff;
+    }
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    #sidebar {
+      width: 300px;
+      flex-shrink: 0;
+      overflow: auto;
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+      padding: 8px 0 24px;
+    }
+    .repo-block { margin-bottom: 4px; }
+    .repo-label {
+      padding: 10px 16px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tutorial-link {
+      display: block;
+      padding: 6px 16px 6px 20px;
+      color: var(--text);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+    }
+    .tutorial-link:hover {
+      background: rgba(59, 130, 246, 0.08);
+    }
+    .tutorial-link.active {
+      background: var(--active-bg);
+      border-left-color: var(--accent);
+      color: #fff;
+    }
+    #view {
+      flex: 1;
+      border: 0;
+      width: 100%;
+      background: #fff;
+    }
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      padding: 40px;
+      text-align: center;
+    }
+    .empty-state.hidden { display: none; }
+    .hidden { display: none !important; }
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      #sidebar { width: 100%; max-height: 35vh; border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Logos Doc-Test Reports</h1>
+      <div class="subtitle">Live reports from <code>main</code> — updated by each repo's CI</div>
+    </div>
+    <div class="os-toggle" id="os-toggle" role="group" aria-label="Platform"></div>
+  </header>
+  <div class="layout">
+    <nav id="sidebar" aria-label="Repositories and tutorials"></nav>
+    <div class="empty-state" id="empty">Loading…</div>
+    <iframe id="view" title="Doc-test report" class="hidden"></iframe>
+  </div>
+
+  <script>
+    const view = document.getElementById("view");
+    const sidebar = document.getElementById("sidebar");
+    const empty = document.getElementById("empty");
+    const osToggle = document.getElementById("os-toggle");
+
+    let cfg = null;
+    let currentOs = "ubuntu-latest";
+    let current = { repo: null, tutorial: null };
+    let syncingFromIframe = false;
+
+    function slug(s) {
+      return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    }
+
+    function reportUrl(repo, os, tutorialName) {
+      const base = `https://${cfg.owner}.github.io/${repo}/main/${os}/`;
+      if (!tutorialName) return base;
+      return base + "#" + encodeURIComponent(slug(tutorialName));
+    }
+
+    function hubHash(repo, os, tutorialName) {
+      const parts = [repo, os];
+      if (tutorialName) parts.push(slug(tutorialName));
+      return "#" + parts.map(encodeURIComponent).join("/");
+    }
+
+    function parseHubHash() {
+      const raw = location.hash.replace(/^#/, "");
+      if (!raw) return null;
+      const parts = raw.split("/").map(decodeURIComponent);
+      if (parts.length < 1) return null;
+      return {
+        repo: parts[0] || null,
+        os: parts[1] || cfg.defaultOs,
+        tutorialSlug: parts[2] || null,
+      };
+    }
+
+    function findTutorialBySlug(repoName, tutorialSlug) {
+      const repo = cfg.repos.find(r => r.name === repoName);
+      if (!repo || !tutorialSlug) return null;
+      return (repo.tutorials || []).find(t => slug(t) === tutorialSlug) || null;
+    }
+
+    function setActiveLink(repoName, tutorialName) {
+      document.querySelectorAll(".tutorial-link").forEach(a => {
+        a.classList.toggle(
+          "active",
+          a.dataset.repo === repoName && a.dataset.tutorial === (tutorialName || "")
+        );
+      });
+    }
+
+    function showReport(repoName, tutorialName, os) {
+      current = { repo: repoName, tutorial: tutorialName || null };
+      currentOs = os;
+      setActiveLink(repoName, tutorialName || "");
+      updateOsButtons();
+
+      const url = reportUrl(repoName, os, tutorialName);
+      view.classList.remove("hidden");
+      empty.classList.add("hidden");
+      view.src = url;
+
+      if (!syncingFromIframe) {
+        history.replaceState(null, "", hubHash(repoName, os, tutorialName));
+      }
+    }
+
+    function updateOsButtons() {
+      osToggle.querySelectorAll("button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.os === currentOs);
+      });
+    }
+
+    function buildOsToggle() {
+      osToggle.innerHTML = "";
+      (cfg.osOptions || ["ubuntu-latest"]).forEach(os => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.os = os;
+        btn.textContent = os.replace("-latest", "");
+        btn.addEventListener("click", () => {
+          if (!current.repo) return;
+          showReport(current.repo, current.tutorial, os);
+        });
+        osToggle.appendChild(btn);
+      });
+    }
+
+    function buildSidebar() {
+      sidebar.innerHTML = "";
+      cfg.repos.forEach(repo => {
+        const block = document.createElement("div");
+        block.className = "repo-block";
+
+        const label = document.createElement("div");
+        label.className = "repo-label";
+        label.textContent = repo.label || repo.name;
+        block.appendChild(label);
+
+        const tutorials = repo.tutorials || [];
+        if (tutorials.length === 0) {
+          const a = document.createElement("a");
+          a.href = "#";
+          a.className = "tutorial-link";
+          a.dataset.repo = repo.name;
+          a.dataset.tutorial = "";
+          a.textContent = "Combined report";
+          a.addEventListener("click", e => {
+            e.preventDefault();
+            showReport(repo.name, null, currentOs);
+          });
+          block.appendChild(a);
+        } else {
+          tutorials.forEach(name => {
+            const a = document.createElement("a");
+            a.href = "#";
+            a.className = "tutorial-link";
+            a.dataset.repo = repo.name;
+            a.dataset.tutorial = name;
+            a.textContent = name;
+            a.addEventListener("click", e => {
+              e.preventDefault();
+              showReport(repo.name, name, currentOs);
+            });
+            block.appendChild(a);
+          });
+        }
+
+        sidebar.appendChild(block);
+      });
+    }
+
+    function selectInitial() {
+      const parsed = parseHubHash();
+      if (parsed && parsed.repo) {
+        const repo = cfg.repos.find(r => r.name === parsed.repo);
+        if (repo) {
+          const os = (cfg.osOptions || []).includes(parsed.os) ? parsed.os : cfg.defaultOs;
+          let tutorial = null;
+          if (parsed.tutorialSlug) {
+            tutorial = findTutorialBySlug(parsed.repo, parsed.tutorialSlug);
+          }
+          if (!tutorial && repo.tutorials && repo.tutorials.length) {
+            tutorial = repo.tutorials[0];
+          }
+          showReport(parsed.repo, tutorial, os);
+          return;
+        }
+      }
+
+      const first = cfg.repos[0];
+      if (first) {
+        const tutorial = (first.tutorials && first.tutorials[0]) || null;
+        showReport(first.name, tutorial, cfg.defaultOs || "ubuntu-latest");
+      } else {
+        empty.textContent = "No repositories configured.";
+      }
+    }
+
+    view.addEventListener("load", () => {
+      if (!current.repo || !view.contentWindow) return;
+      try {
+        const iframeHash = view.contentWindow.location.hash.replace(/^#/, "");
+        if (!iframeHash) return;
+        const tutorial = findTutorialBySlug(current.repo, decodeURIComponent(iframeHash));
+        if (tutorial && tutorial !== current.tutorial) {
+          syncingFromIframe = true;
+          current.tutorial = tutorial;
+          setActiveLink(current.repo, tutorial);
+          history.replaceState(null, "", hubHash(current.repo, currentOs, tutorial));
+          syncingFromIframe = false;
+        }
+      } catch (_) {
+        /* cross-origin or not yet loaded */
+      }
+    });
+
+    window.addEventListener("hashchange", () => {
+      if (syncingFromIframe || !cfg) return;
+      const parsed = parseHubHash();
+      if (!parsed || !parsed.repo) return;
+      const tutorial = parsed.tutorialSlug
+        ? findTutorialBySlug(parsed.repo, parsed.tutorialSlug)
+        : null;
+      showReport(parsed.repo, tutorial, parsed.os || cfg.defaultOs);
+    });
+
+    fetch("repos.json")
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to load repos.json");
+        return r.json();
+      })
+      .then(data => {
+        cfg = data;
+        currentOs = cfg.defaultOs || "ubuntu-latest";
+        buildOsToggle();
+        buildSidebar();
+        selectInitial();
+      })
+      .catch(err => {
+        empty.textContent = "Could not load configuration: " + err.message;
+      });
+  </script>
+</body>
+</html>

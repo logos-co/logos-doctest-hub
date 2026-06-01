@@ -1,0 +1,65 @@
+{
+  "owner": "logos-co",
+  "osOptions": ["ubuntu-latest", "macos-latest"],
+  "defaultOs": "ubuntu-latest",
+  "repos": [
+    {
+      "name": "logos-tutorial",
+      "label": "Logos Tutorial",
+      "tutorials": [
+        "Tutorial: Wrapping a C Library as a Logos Module",
+        "Tutorial Part 2: Building a QML UI for Your Logos Module",
+        "Tutorial Part 3: Building a C++ UI Module (Process-Isolated)"
+      ]
+    },
+    {
+      "name": "logos-accounts-module",
+      "label": "Accounts Module",
+      "tutorials": [
+        "Running This Accounts Module Against logoscore",
+        "Driving the Accounts UI Against This Module"
+      ]
+    },
+    {
+      "name": "logos-wallet-module",
+      "label": "Wallet Module",
+      "tutorials": [
+        "Running This Wallet Module Against logoscore",
+        "Driving the Wallet UI Against This Module"
+      ]
+    },
+    {
+      "name": "logos-package-manager",
+      "label": "Package Manager",
+      "tutorials": [
+        "Managing Local Packages with lgpm",
+        "Installing a Real Module with lgpm"
+      ]
+    },
+    {
+      "name": "logos-liblogos",
+      "label": "liblogos",
+      "tutorials": [
+        "Running a Real Module Against This liblogos"
+      ]
+    },
+    {
+      "name": "logos-logoscore-cli",
+      "label": "logoscore CLI",
+      "tutorials": [
+        "Running Modules with the logoscore Daemon"
+      ]
+    },
+    {
+      "name": "logos-doctest",
+      "label": "doctest",
+      "tutorials": [
+        "doctest, doctested: writing and running your first spec",
+        "Rendering, reports, and failures",
+        "Chaining specs and cleaning the output tree",
+        "Combined reports and release pinning",
+        "The rest of the spec format: binary files, comparison, and Logos hooks"
+      ]
+    }
+  ]
+}
