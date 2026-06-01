@@ -154,8 +154,12 @@
       return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
     }
 
+    function reportBase(repo, os) {
+      return `https://${cfg.owner}.github.io/${repo}/main/${os}/`;
+    }
+
     function reportUrl(repo, os, tutorialName) {
-      const base = `https://${cfg.owner}.github.io/${repo}/main/${os}/`;
+      const base = reportBase(repo, os);
       if (!tutorialName) return base;
       return base + "#" + encodeURIComponent(slug(tutorialName));
     }
@@ -193,16 +197,103 @@
       });
     }
 
+    function iframeHasDeepLinks(doc) {
+      return Array.from(doc.querySelectorAll("script")).some(
+        s => s.textContent && s.textContent.includes("indexFromHash")
+      );
+    }
+
+    // Same-origin iframes: patch older reports that still call render(0) and
+    // ignore the URL hash (e.g. logos-tutorial before logos-doctest deep links
+    // landed in CI). Newer reports already handle hash themselves.
+    function patchIframeDeepLinks() {
+      if (!current.repo) return;
+      let doc;
+      try {
+        doc = view.contentDocument;
+      } catch (_) {
+        return;
+      }
+      if (!doc || !doc.getElementById("report-data")) return;
+
+      if (iframeHasDeepLinks(doc)) return;
+
+      if (doc.getElementById("hub-deeplink-patch")) {
+        if (doc.defaultView.__hubApplyTutorialHash) {
+          doc.defaultView.__hubApplyTutorialHash();
+        }
+        return;
+      }
+
+      const patch = doc.createElement("script");
+      patch.id = "hub-deeplink-patch";
+      patch.textContent = `
+(function() {
+  const DATA = JSON.parse(document.getElementById("report-data").textContent);
+  const picker = document.getElementById("picker");
+  if (!picker || !DATA.tutorials) return;
+
+  function slug(s) {
+    return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+  function indexFromHash() {
+    const raw = decodeURIComponent(location.hash.replace(/^#/, ""));
+    if (!raw) return 0;
+    if (/^\\d+$/.test(raw) && +raw < DATA.tutorials.length) return +raw;
+    const i = DATA.tutorials.findIndex(
+      t => slug(t.meta.name) === raw || t.meta.name === raw
+    );
+    return i >= 0 ? i : 0;
+  }
+  function applyTutorialFromHash() {
+    const idx = indexFromHash();
+    if (+picker.value !== idx) {
+      picker.value = String(idx);
+      picker.dispatchEvent(new Event("change"));
+    }
+  }
+  window.__hubApplyTutorialHash = applyTutorialFromHash;
+  picker.addEventListener("change", () => {
+    const idx = +picker.value;
+    const name = DATA.tutorials[idx] && DATA.tutorials[idx].meta.name;
+    if (name) location.hash = slug(name);
+  });
+  window.addEventListener("hashchange", applyTutorialFromHash);
+  applyTutorialFromHash();
+})();
+      `;
+      doc.body.appendChild(patch);
+    }
+
+    function navigateIframe(url, base) {
+      const loadedBase = view.dataset.loadedBase || "";
+      const sameDocument = loadedBase === base && view.src && !view.classList.contains("hidden");
+
+      if (sameDocument) {
+        try {
+          view.contentWindow.location.replace(url);
+          patchIframeDeepLinks();
+          return;
+        } catch (_) {
+          /* fall through to full navigation */
+        }
+      }
+
+      view.dataset.loadedBase = base;
+      view.src = url;
+    }
+
     function showReport(repoName, tutorialName, os) {
       current = { repo: repoName, tutorial: tutorialName || null };
       currentOs = os;
       setActiveLink(repoName, tutorialName || "");
       updateOsButtons();
 
+      const base = reportBase(repoName, os);
       const url = reportUrl(repoName, os, tutorialName);
       view.classList.remove("hidden");
       empty.classList.add("hidden");
-      view.src = url;
+      navigateIframe(url, base);
 
       if (!syncingFromIframe) {
         history.replaceState(null, "", hubHash(repoName, os, tutorialName));
@@ -303,6 +394,8 @@
 
     view.addEventListener("load", () => {
       if (!current.repo || !view.contentWindow) return;
+      view.dataset.loadedBase = reportBase(current.repo, currentOs);
+      patchIframeDeepLinks();
       try {
         const iframeHash = view.contentWindow.location.hash.replace(/^#/, "");
         if (!iframeHash) return;
@@ -315,7 +408,7 @@
           syncingFromIframe = false;
         }
       } catch (_) {
-        /* cross-origin or not yet loaded */
+        /* not yet loaded */
       }
     });
 
