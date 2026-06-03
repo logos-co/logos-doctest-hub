@@ -36,6 +36,32 @@ Edit [`repos.json`](repos.json):
 
 After merging, the hub site updates on the next push to `main`.
 
+## Versions
+
+The header has a **version dropdown** that selects which published report directory
+the hub embeds. A version maps to the path segment in the Pages URL
+(`<repo>/<dir>/<os>/`) and may restrict which repos are listed.
+
+Edit the `versions` array in [`repos.json`](repos.json):
+
+```json
+"defaultVersion": "main",
+"versions": [
+  { "id": "main", "label": "main", "dir": "main" },
+  { "id": "v3", "label": "releases/v3", "dir": "releases/v3", "repos": ["logos-tutorial"] }
+]
+```
+
+- `id` — stable key used in deep-link hashes.
+- `label` — text shown in the dropdown.
+- `dir` — Pages directory segment for this version's reports.
+- `repos` *(optional)* — repo `name`s to show for this version. Omit to show all repos.
+
+`defaultVersion` selects the version shown on load (and its hashes omit the version
+prefix, so existing `#<repo>/<os>/<tutorial>` links keep working). Versions reuse each
+repo's existing `tutorials` array — there's no per-version tutorial list. The dropdown
+is hidden when only one version is configured.
+
 ## Refreshing the manifest
 
 When you add, rename, or remove `*.test.yaml` specs — or change which specs CI passes to
