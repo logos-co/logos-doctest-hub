@@ -42,8 +42,24 @@
       color: var(--muted);
       font-size: 13px;
     }
-    .os-toggle {
+    .controls {
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .version-select {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 12px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .version-select.hidden { display: none; }
+    .os-toggle {
       display: flex;
       gap: 4px;
       background: var(--bg);
@@ -129,9 +145,12 @@
   <header>
     <div>
       <h1>Logos Doc-Test Reports</h1>
-      <div class="subtitle">Live reports from <code>main</code> — updated by each repo's CI</div>
+      <div class="subtitle">Live reports from <code id="subtitle-version">main</code> — updated by each repo's CI</div>
     </div>
-    <div class="os-toggle" id="os-toggle" role="group" aria-label="Platform"></div>
+    <div class="controls">
+      <select class="version-select hidden" id="version-select" aria-label="Version"></select>
+      <div class="os-toggle" id="os-toggle" role="group" aria-label="Platform"></div>
+    </div>
   </header>
   <div class="layout">
     <nav id="sidebar" aria-label="Repositories and tutorials"></nav>
@@ -144,9 +163,12 @@
     const sidebar = document.getElementById("sidebar");
     const empty = document.getElementById("empty");
     const osToggle = document.getElementById("os-toggle");
+    const versionSelect = document.getElementById("version-select");
+    const subtitleVersion = document.getElementById("subtitle-version");
 
     let cfg = null;
     let currentOs = "ubuntu-latest";
+    let currentVersion = "main";
     let current = { repo: null, tutorial: null };
     let syncingFromIframe = false;
 
@@ -154,8 +176,35 @@
       return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
     }
 
+    function versions() {
+      return (cfg && cfg.versions && cfg.versions.length)
+        ? cfg.versions
+        : [{ id: "main", label: "main", dir: "main" }];
+    }
+
+    function findVersion(id) {
+      return versions().find(v => v.id === id) || null;
+    }
+
+    function defaultVersionId() {
+      return (cfg && cfg.defaultVersion) || versions()[0].id;
+    }
+
+    function currentVersionDir() {
+      const v = findVersion(currentVersion);
+      return (v && v.dir) || "main";
+    }
+
+    function reposForVersion(versionId) {
+      const v = findVersion(versionId);
+      const all = (cfg && cfg.repos) || [];
+      if (!v || !Array.isArray(v.repos)) return all;
+      const allowed = new Set(v.repos);
+      return all.filter(r => allowed.has(r.name));
+    }
+
     function reportBase(repo, os) {
-      return `https://${cfg.owner}.github.io/${repo}/main/${os}/`;
+      return `https://${cfg.owner}.github.io/${repo}/${currentVersionDir()}/${os}/`;
     }
 
     function reportUrl(repo, os, tutorialName) {
@@ -164,8 +213,10 @@
       return base + "#" + encodeURIComponent(slug(tutorialName));
     }
 
-    function hubHash(repo, os, tutorialName) {
-      const parts = [repo, os];
+    function hubHash(repo, os, tutorialName, versionId) {
+      const parts = [];
+      if (versionId && versionId !== defaultVersionId()) parts.push(versionId);
+      parts.push(repo, os);
       if (tutorialName) parts.push(slug(tutorialName));
       return "#" + parts.map(encodeURIComponent).join("/");
     }
@@ -173,9 +224,15 @@
     function parseHubHash() {
       const raw = location.hash.replace(/^#/, "");
       if (!raw) return null;
-      const parts = raw.split("/").map(decodeURIComponent);
+      let parts = raw.split("/").map(decodeURIComponent);
       if (parts.length < 1) return null;
+      // Leading segment may be a known version id; otherwise default version.
+      let version = defaultVersionId();
+      if (parts.length && findVersion(parts[0])) {
+        version = parts.shift();
+      }
       return {
+        version,
         repo: parts[0] || null,
         os: parts[1] || cfg.defaultOs,
         tutorialSlug: parts[2] || null,
@@ -296,7 +353,7 @@
       navigateIframe(url, base);
 
       if (!syncingFromIframe) {
-        history.replaceState(null, "", hubHash(repoName, os, tutorialName));
+        history.replaceState(null, "", hubHash(repoName, os, tutorialName, currentVersion));
       }
     }
 
@@ -304,6 +361,48 @@
       osToggle.querySelectorAll("button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.os === currentOs);
       });
+    }
+
+    function updateSubtitle() {
+      const v = findVersion(currentVersion);
+      subtitleVersion.textContent = (v && v.label) || currentVersion;
+    }
+
+    function buildVersionSelect() {
+      versionSelect.innerHTML = "";
+      const list = versions();
+      list.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v.id;
+        opt.textContent = v.label || v.id;
+        versionSelect.appendChild(opt);
+      });
+      versionSelect.classList.toggle("hidden", list.length <= 1);
+      versionSelect.value = currentVersion;
+      versionSelect.onchange = () => switchVersion(versionSelect.value);
+    }
+
+    // Switch to a version and select an appropriate repo/tutorial within it.
+    function switchVersion(versionId) {
+      currentVersion = findVersion(versionId) ? versionId : defaultVersionId();
+      versionSelect.value = currentVersion;
+      updateSubtitle();
+      buildSidebar();
+
+      const repos = reposForVersion(currentVersion);
+      // Keep the current repo if it exists in this version, else pick the first.
+      const keep = repos.find(r => r.name === current.repo);
+      const target = keep || repos[0];
+      if (target) {
+        const tutorial = (target.tutorials && target.tutorials[0]) || null;
+        const tutorialStillValid = keep && current.tutorial &&
+          (target.tutorials || []).includes(current.tutorial);
+        showReport(target.name, tutorialStillValid ? current.tutorial : tutorial, currentOs);
+      } else {
+        empty.textContent = "No repositories for this version.";
+        empty.classList.remove("hidden");
+        view.classList.add("hidden");
+      }
     }
 
     function buildOsToggle() {
@@ -323,7 +422,7 @@
 
     function buildSidebar() {
       sidebar.innerHTML = "";
-      cfg.repos.forEach(repo => {
+      reposForVersion(currentVersion).forEach(repo => {
         const block = document.createElement("div");
         block.className = "repo-block";
 
@@ -367,8 +466,16 @@
 
     function selectInitial() {
       const parsed = parseHubHash();
+      if (parsed) {
+        currentVersion = findVersion(parsed.version) ? parsed.version : defaultVersionId();
+      }
+      versionSelect.value = currentVersion;
+      updateSubtitle();
+      buildSidebar();
+
+      const repos = reposForVersion(currentVersion);
       if (parsed && parsed.repo) {
-        const repo = cfg.repos.find(r => r.name === parsed.repo);
+        const repo = repos.find(r => r.name === parsed.repo);
         if (repo) {
           const os = (cfg.osOptions || []).includes(parsed.os) ? parsed.os : cfg.defaultOs;
           let tutorial = null;
@@ -383,12 +490,14 @@
         }
       }
 
-      const first = cfg.repos[0];
+      const first = repos[0];
       if (first) {
         const tutorial = (first.tutorials && first.tutorials[0]) || null;
         showReport(first.name, tutorial, cfg.defaultOs || "ubuntu-latest");
       } else {
         empty.textContent = "No repositories configured.";
+        empty.classList.remove("hidden");
+        view.classList.add("hidden");
       }
     }
 
@@ -416,6 +525,15 @@
       if (syncingFromIframe || !cfg) return;
       const parsed = parseHubHash();
       if (!parsed || !parsed.repo) return;
+      const version = findVersion(parsed.version) ? parsed.version : defaultVersionId();
+      if (version !== currentVersion) {
+        currentVersion = version;
+        versionSelect.value = currentVersion;
+        updateSubtitle();
+        buildSidebar();
+      }
+      // Ignore repos not available in the selected version.
+      if (!reposForVersion(currentVersion).some(r => r.name === parsed.repo)) return;
       const tutorial = parsed.tutorialSlug
         ? findTutorialBySlug(parsed.repo, parsed.tutorialSlug)
         : null;
@@ -430,8 +548,9 @@
       .then(data => {
         cfg = data;
         currentOs = cfg.defaultOs || "ubuntu-latest";
+        currentVersion = defaultVersionId();
+        buildVersionSelect();
         buildOsToggle();
-        buildSidebar();
         selectInitial();
       })
       .catch(err => {

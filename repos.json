@@ -5,6 +5,11 @@
     "macos-latest"
   ],
   "defaultOs": "ubuntu-latest",
+  "defaultVersion": "main",
+  "versions": [
+    { "id": "main", "label": "main", "dir": "main" },
+    { "id": "v3", "label": "releases/v3", "dir": "61", "repos": ["logos-tutorial"] }
+  ],
   "repos": [
     {
       "name": "logos-tutorial",
