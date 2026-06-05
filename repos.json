@@ -7,8 +7,19 @@
   "defaultOs": "ubuntu-latest",
   "defaultVersion": "main",
   "versions": [
-    { "id": "main", "label": "main", "dir": "main" },
-    { "id": "v3", "label": "releases/v3", "dir": "pr-61", "repos": ["logos-tutorial"] }
+    {
+      "id": "main",
+      "label": "nightly edge (dev, unstable)",
+      "dir": "main"
+    },
+    {
+      "id": "v3",
+      "label": "releases/v3 (stable)",
+      "dir": "pr-61",
+      "repos": [
+        "logos-tutorial"
+      ]
+    }
   ],
   "repos": [
     {
@@ -17,7 +28,8 @@
       "tutorials": [
         "Tutorial: Wrapping a C Library as a Logos Module",
         "Tutorial Part 2: Building a QML UI for Your Logos Module",
-        "Tutorial Part 3: Building a C++ UI Module (Process-Isolated)"
+        "Tutorial Part 3: Building a C++ UI Module (Process-Isolated)",
+        "Tutorial: Composing Modules with the Module Context"
       ]
     },
     {
@@ -40,7 +52,8 @@
       "name": "logos-basecamp",
       "label": "Logos Basecamp",
       "tutorials": [
-        "Installing Modules Through the Basecamp Package Manager"
+        "Exploring Installed Apps and Loaded Modules in Basecamp",
+        "Exploring Installed Apps and Loaded Modules in the Basecamp Bundle"
       ]
     },
     {
@@ -49,6 +62,31 @@
       "tutorials": [
         "Installing a Real Module with lgpm",
         "Managing Local Packages with lgpm"
+      ]
+    },
+    {
+      "name": "logos-cpp-sdk",
+      "label": "C++ SDK",
+      "tutorials": [
+        "Running a Real Module Against This C++ SDK",
+        "Composing Two Modules Built Against This C++ SDK"
+      ]
+    },
+    {
+      "name": "logos-rust-sdk",
+      "label": "Rust SDK",
+      "tutorials": [
+        "Writing a Rust Logos Module and Running It Against logoscore"
+      ]
+    },
+    {
+      "name": "logos-dev-boost",
+      "label": "Dev Boost",
+      "tutorials": [
+        "Scaffolding a Pure C++ Module with logos-dev-boost",
+        "Wrapping an External C Library with logos-dev-boost",
+        "Scaffolding a QML UI App with logos-dev-boost",
+        "Scaffolding a QML UI App with a C++ Backend (logos-dev-boost)"
       ]
     },
     {
