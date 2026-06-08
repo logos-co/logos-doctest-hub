@@ -80,6 +80,20 @@
       ]
     },
     {
+      "name": "logos-capability-module",
+      "label": "Capability Module",
+      "tutorials": [
+        "Composing Two Modules Through This Capability Module"
+      ]
+    },
+    {
+      "name": "openmetrics-module",
+      "label": "OpenMetrics Module",
+      "tutorials": [
+        "Serving OpenMetrics by Scraping Modules"
+      ]
+    },
+    {
       "name": "logos-dev-boost",
       "label": "Dev Boost",
       "tutorials": [
