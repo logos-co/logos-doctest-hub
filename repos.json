@@ -29,7 +29,8 @@
         "Tutorial: Wrapping a C Library as a Logos Module",
         "Tutorial Part 2: Building a QML UI for Your Logos Module",
         "Tutorial Part 3: Building a C++ UI Module (Process-Isolated)",
-        "Tutorial: Composing Modules with the Module Context"
+        "Tutorial: Composing Modules with the Module Context",
+        "Tutorial: Dependency Interfaces — Bind a Module by Contract"
       ]
     },
     {
@@ -53,7 +54,9 @@
       "label": "Logos Basecamp",
       "tutorials": [
         "Exploring Installed Apps and Loaded Modules in Basecamp",
-        "Exploring Installed Apps and Loaded Modules in the Basecamp Bundle"
+        "Exploring Installed Apps and Loaded Modules in the Basecamp Bundle",
+        "Cross-version check: freshly-built accounts against the latest released counterpart",
+        "Cross-version check: freshly-built chat against the latest released counterpart"
       ]
     },
     {
@@ -69,7 +72,8 @@
       "label": "C++ SDK",
       "tutorials": [
         "Running a Real Module Against This C++ SDK",
-        "Composing Two Modules Built Against This C++ SDK"
+        "Composing Two Modules Built Against This C++ SDK",
+        "Calling a Module From a Worker Thread (HTTP Server)"
       ]
     },
     {
