@@ -89,6 +89,7 @@
       "tutorials": [
         "Cross-Language Composition: C++ and Rust Modules, One Contract Language",
         "Cross-Language Composition, Reversed: LIDL-First Rust, Pure C++, Pure Rust",
+        "Tutorial: A UI App with a Typed Backend (interface: universal)",
         "Wrapping an External Library — 1. Source in the Same Repo",
         "Wrapping an External Library — 2. Prebuilt Binaries (Multi-Platform)",
         "Wrapping an External Library — 3. External Source (build with make)",
