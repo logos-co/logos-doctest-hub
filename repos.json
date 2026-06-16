@@ -60,6 +60,14 @@
       ]
     },
     {
+      "name": "logos-package",
+      "label": "Package (lgx)",
+      "tutorials": [
+        "Packaging a Module with lgx",
+        "Signing and Trusting an lgx Package"
+      ]
+    },
+    {
       "name": "logos-package-manager",
       "label": "Package Manager",
       "tutorials": [
@@ -80,7 +88,7 @@
       "name": "logos-rust-sdk",
       "label": "Rust SDK",
       "tutorials": [
-        "Writing a Rust Logos Module and Running It Against logoscore"
+        "Cross-Language Composition: a Rust Consumer Driving a Rust and a C++ Module"
       ]
     },
     {
@@ -90,6 +98,7 @@
         "Cross-Language Composition: C++ and Rust Modules, One Contract Language",
         "Cross-Language Composition, Reversed: LIDL-First Rust, Pure C++, Pure Rust",
         "Tutorial: A UI App with a Typed Backend (interface: universal)",
+        "Qt-Free Outbound: a cdylib C++ module calls its dependency over the lp_* C ABI",
         "Wrapping an External Library — 1. Source in the Same Repo",
         "Wrapping an External Library — 2. Prebuilt Binaries (Multi-Platform)",
         "Wrapping an External Library — 3. External Source (build with make)",
@@ -101,6 +110,13 @@
       "label": "Capability Module",
       "tutorials": [
         "Composing Two Modules Through This Capability Module"
+      ]
+    },
+    {
+      "name": "logos-execution-zone-module",
+      "label": "Execution-Zone Module",
+      "tutorials": [
+        "Running This Execution-Zone Module Against logoscore"
       ]
     },
     {
@@ -124,14 +140,16 @@
       "name": "logos-liblogos",
       "label": "liblogos",
       "tutorials": [
-        "Running a Real Module Against This liblogos"
+        "Running a Real Module Against This liblogos",
+        "Embedding This liblogos as a Library"
       ]
     },
     {
       "name": "logos-logoscore-cli",
       "label": "logoscore CLI",
       "tutorials": [
-        "Running Modules with the logoscore Daemon"
+        "Running Modules with the logoscore Daemon",
+        "Reaching the logoscore Daemon over TCP and TCP+TLS"
       ]
     },
     {
