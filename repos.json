@@ -1,9 +1,6 @@
 {
   "owner": "logos-co",
-  "osOptions": [
-    "ubuntu-latest",
-    "macos-latest"
-  ],
+  "osOptions": ["ubuntu-latest", "macos-latest"],
   "defaultOs": "ubuntu-latest",
   "defaultVersion": "main",
   "versions": [
@@ -16,9 +13,7 @@
       "id": "v3",
       "label": "releases/v3 (stable)",
       "dir": "pr-61",
-      "repos": [
-        "logos-tutorial"
-      ]
+      "repos": ["logos-tutorial"]
     }
   ],
   "repos": [
@@ -108,23 +103,17 @@
     {
       "name": "logos-capability-module",
       "label": "Capability Module",
-      "tutorials": [
-        "Composing Two Modules Through This Capability Module"
-      ]
+      "tutorials": ["Composing Two Modules Through This Capability Module"]
     },
     {
       "name": "logos-execution-zone-module",
       "label": "Execution-Zone Module",
-      "tutorials": [
-        "Running This Execution-Zone Module Against logoscore"
-      ]
+      "tutorials": ["Running This Execution-Zone Module Against logoscore"]
     },
     {
       "name": "openmetrics-module",
       "label": "OpenMetrics Module",
-      "tutorials": [
-        "Serving OpenMetrics by Scraping Modules"
-      ]
+      "tutorials": ["Serving OpenMetrics by Scraping Modules"]
     },
     {
       "name": "logos-dev-boost",
@@ -168,58 +157,47 @@
     {
       "name": "logos-evm-net-proxy",
       "label": "EVM Net Proxy",
-      "tutorials": [
-        "Proving the Fail-Closed Invariant of logos-net-proxy"
-      ]
+      "tutorials": ["Proving the Fail-Closed Invariant of logos-net-proxy"]
     },
     {
       "name": "logos-evm-keystore-module",
       "label": "EVM Keystore Module",
-      "tutorials": [
-        "Running the Keystore Module Against logoscore"
-      ]
+      "tutorials": ["Running the Keystore Module Against logoscore"]
     },
     {
       "name": "logos-evm-eth-rpc-module",
       "label": "EVM eth-rpc Module",
-      "tutorials": [
-        "Running the eth-rpc Module Against logoscore"
-      ]
+      "tutorials": ["Running the eth-rpc Module Against logoscore"]
     },
     {
       "name": "logos-evm-token-list-module",
       "label": "EVM Token List Module",
-      "tutorials": [
-        "Running the token-list Module Against logoscore"
-      ]
+      "tutorials": ["Running the token-list Module Against logoscore"]
     },
     {
       "name": "logos-evm-uniswap-module",
       "label": "EVM Uniswap Module",
-      "tutorials": [
-        "Pricing Tokens with the Uniswap Module on logoscore"
-      ]
+      "tutorials": ["Pricing Tokens with the Uniswap Module on logoscore"]
     },
     {
       "name": "logos-evm-railgun-module",
       "label": "EVM RAILGUN Module",
-      "tutorials": [
-        "Running the RAILGUN Module Against logoscore"
-      ]
+      "tutorials": ["Running the RAILGUN Module Against logoscore"]
     },
     {
       "name": "logos-evm-wallet-backend-module",
       "label": "EVM Wallet Backend",
-      "tutorials": [
-        "Driving the Wallet Backend (4 modules) Against logoscore"
-      ]
+      "tutorials": ["Driving the Wallet Backend (4 modules) Against logoscore"]
     },
     {
       "name": "logos-evm-wallet-ui",
       "label": "EVM Wallet UI",
-      "tutorials": [
-        "Driving the Wallet UI App Headlessly"
-      ]
+      "tutorials": ["Driving the Wallet UI App Headlessly"]
+    },
+    {
+      "name": "logos-storage-module",
+      "label": "doctest",
+      "tutorials": ["Running This Storage Module Against logoscore"]
     }
   ]
 }
