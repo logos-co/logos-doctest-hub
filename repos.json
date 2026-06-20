@@ -164,6 +164,55 @@
         "Automating a repo's doc-tests with a run.sh",
         "Running doc-tests in CI and publishing reports to GitHub Pages"
       ]
+    },
+    {
+      "name": "logos-evm-net-proxy",
+      "label": "EVM Net Proxy",
+      "tutorials": [
+        "Proving the Fail-Closed Invariant of logos-net-proxy"
+      ]
+    },
+    {
+      "name": "logos-evm-keystore-module",
+      "label": "EVM Keystore Module",
+      "tutorials": [
+        "Running the Keystore Module Against logoscore"
+      ]
+    },
+    {
+      "name": "logos-evm-eth-rpc-module",
+      "label": "EVM eth-rpc Module",
+      "tutorials": [
+        "Running the eth-rpc Module Against logoscore"
+      ]
+    },
+    {
+      "name": "logos-evm-token-list-module",
+      "label": "EVM Token List Module",
+      "tutorials": [
+        "Running the token-list Module Against logoscore"
+      ]
+    },
+    {
+      "name": "logos-evm-uniswap-module",
+      "label": "EVM Uniswap Module",
+      "tutorials": [
+        "Pricing Tokens with the Uniswap Module on logoscore"
+      ]
+    },
+    {
+      "name": "logos-evm-wallet-backend-module",
+      "label": "EVM Wallet Backend",
+      "tutorials": [
+        "Driving the Wallet Backend (4 modules) Against logoscore"
+      ]
+    },
+    {
+      "name": "logos-evm-wallet-ui",
+      "label": "EVM Wallet UI",
+      "tutorials": [
+        "Driving the Wallet UI App Headlessly"
+      ]
     }
   ]
 }
