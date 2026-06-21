@@ -201,6 +201,13 @@
       ]
     },
     {
+      "name": "logos-evm-railgun-module",
+      "label": "EVM RAILGUN Module",
+      "tutorials": [
+        "Running the RAILGUN Module Against logoscore"
+      ]
+    },
+    {
       "name": "logos-evm-wallet-backend-module",
       "label": "EVM Wallet Backend",
       "tutorials": [
