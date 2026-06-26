@@ -220,6 +220,15 @@
       "tutorials": [
         "Driving the Wallet UI App Headlessly"
       ]
+    },
+    {
+      "name": "logos-storage-module",
+      "label": "doctest",
+      "tutorials": [
+        "Running This Storage Module Against logoscore",
+        "Running a Mix Network of Storage Nodes",
+        "Driving the Storage UI Against This Module"
+      ]
     }
   ]
 }
