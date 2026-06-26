@@ -223,7 +223,7 @@
     },
     {
       "name": "logos-storage-module",
-      "label": "doctest",
+      "label": "Storage Module",
       "tutorials": [
         "Running This Storage Module Against logoscore",
         "Running a Mix Network of Storage Nodes",
