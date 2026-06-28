@@ -19,6 +19,14 @@
       "repos": [
         "logos-tutorial"
       ]
+    },
+    {
+      "id": "v4",
+      "label": "releases/v4 (stable)",
+      "dir": "pr-76",
+      "repos": [
+        "logos-tutorial"
+      ]
     }
   ],
   "repos": [
