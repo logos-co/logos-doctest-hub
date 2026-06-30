@@ -233,7 +233,7 @@
       "name": "logos-storage-module",
       "label": "Storage Module",
       "tutorials": [
-        "Running This Storage Module Against logoscore",
+        "Preparing and Running a Logos Node with Storage",
         "Running a Mix Network of Storage Nodes",
         "Driving the Storage UI Against This Module"
       ]
