@@ -40,31 +40,65 @@ def find_publish_workflow(repo_dir: Path) -> Path | None:
     return None
 
 
-def _parse_run_args(args_block: str, repo_dir: Path) -> list[Path]:
+def _bash_arrays(workflow_text: str) -> dict[str, list[str]]:
+    """Map bash array names to their tokens: ``NAME=( a b c )``.
+
+    Some repos pass specs as ``"${SPECS[@]}"`` (portable to the macOS runner's
+    stock bash 3.2) rather than inlining the glob on the ``-- run`` line, and
+    may assign the same array more than once (e.g. a reduced macOS branch). We
+    union all assignments of a name, preserving first-seen order, so the
+    tutorial list reflects every spec the report can contain on any platform.
+    Mirrors the array handling in logos-workspace's tests-and-doctests.yml.
+    """
+    arrays: dict[str, list[str]] = {}
+    for name, body in re.findall(r"(\w+)=\(([^)]*)\)", workflow_text):
+        bucket = arrays.setdefault(name, [])
+        for tok in body.split():
+            if tok not in bucket:
+                bucket.append(tok)
+    return arrays
+
+
+def _expand_token(token: str, arrays: dict[str, list[str]]) -> list[str]:
+    """Resolve a ``${NAME[@]}`` / ``$NAME`` reference to the array's tokens."""
+    m = re.fullmatch(r"\$\{?(\w+)(?:\[[@*]\])?\}?", token)
+    if m and m.group(1) in arrays:
+        return arrays[m.group(1)]
+    return [token]
+
+
+def _parse_run_args(
+    args_block: str,
+    repo_dir: Path,
+    arrays: dict[str, list[str]] | None = None,
+) -> list[Path]:
+    arrays = arrays or {}
     args_block = re.sub(r"\\\s*\n", " ", args_block)
     args_block = re.sub(r"\$\{\{[^}]+\}\}", "", args_block)
 
     specs: list[Path] = []
-    for token in args_block.split():
-        token = token.strip().strip('"').strip("'")
-        if not token or token.startswith("-"):
-            continue
-        if ".test.yaml" not in token:
-            continue
-        if "*" in token:
-            if "/" in token:
-                rel_dir, pattern = token.rsplit("/", 1)
-                base = repo_dir / rel_dir
+    for raw in args_block.split():
+        raw = raw.strip().strip('"').strip("'")
+        for token in _expand_token(raw, arrays):
+            token = token.strip().strip('"').strip("'")
+            if not token or token.startswith("-"):
+                continue
+            if ".test.yaml" not in token:
+                continue
+            if "*" in token:
+                if "/" in token:
+                    rel_dir, pattern = token.rsplit("/", 1)
+                    base = repo_dir / rel_dir
+                else:
+                    base = repo_dir
+                    pattern = token
+                for path in sorted(base.glob(pattern)):
+                    if path.is_file():
+                        specs.append(path.resolve())
             else:
-                base = repo_dir
-                pattern = token
-            for path in sorted(base.glob(pattern)):
+                path = (repo_dir / token).resolve()
                 if path.is_file():
-                    specs.append(path.resolve())
-        else:
-            path = (repo_dir / token).resolve()
-            if path.is_file():
-                specs.append(path)
+                    specs.append(path)
     return specs
 
 
@@ -83,9 +117,10 @@ def extract_report_specs(workflow_text: str, repo_dir: Path) -> list[Path]:
     if not matches:
         return []
 
+    arrays = _bash_arrays(workflow_text)
     candidates: list[list[Path]] = []
     for match in matches:
-        specs = _parse_run_args(match.group(1), repo_dir)
+        specs = _parse_run_args(match.group(1), repo_dir, arrays)
         if specs:
             candidates.append(specs)
 
