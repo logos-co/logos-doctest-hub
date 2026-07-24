@@ -58,13 +58,38 @@
       ]
     },
     {
+      "name": "logos-chat-module",
+      "label": "Chat Module",
+      "tutorials": [
+        "Headless two-instance message exchange",
+        "Headless three-instance group conversation"
+      ]
+    },
+    {
+      "name": "logos-chat-ui",
+      "label": "Chat UI",
+      "tutorials": [
+        "Tutorial: The Logos Chat UI",
+        "Tutorial: Run the automated message-exchange test",
+        "Tutorial: Run the automated group-chat test"
+      ]
+    },
+    {
+      "name": "logos-delivery-module",
+      "label": "Delivery Module",
+      "tutorials": [
+        "Running This Delivery Module Against logoscore"
+      ]
+    },
+    {
       "name": "logos-basecamp",
       "label": "Logos Basecamp",
       "tutorials": [
         "Exploring Installed Apps and Loaded Modules in Basecamp",
         "Exploring Installed Apps and Loaded Modules in the Basecamp Bundle",
         "Cross-version check: freshly-built accounts against the latest released counterpart",
-        "Cross-version check: freshly-built chat against the latest released counterpart"
+        "Driving the full API surface through a UI plugin in Basecamp",
+        "Driving the full API surface through a QML-only UI plugin in Basecamp"
       ]
     },
     {
@@ -89,14 +114,18 @@
       "tutorials": [
         "Running a Real Module Against This C++ SDK",
         "Composing Two Modules Built Against This C++ SDK",
-        "Calling a Module From a Worker Thread (HTTP Server)"
+        "Calling a Module From a Worker Thread (HTTP Server)",
+        "Concurrent Dispatch (C++): a single-threaded module driving a concurrent one",
+        "The C++ Generator: LIDL ⇄ C++ (provider & consumer)"
       ]
     },
     {
       "name": "logos-rust-sdk",
       "label": "Rust SDK",
       "tutorials": [
-        "Cross-Language Composition: a Rust Consumer Driving a Rust and a C++ Module"
+        "Cross-Language Composition: a Rust Consumer Driving a Rust and a C++ Module",
+        "Concurrent Dispatch: a single-threaded module driving a concurrent one",
+        "The Rust Generator: LIDL ⇄ Rust (provider & consumer)"
       ]
     },
     {
@@ -156,7 +185,10 @@
       "name": "logos-logoscore-cli",
       "label": "logoscore CLI",
       "tutorials": [
+        "Exercising the full API surface across languages, proxies, and events",
+        "Concurrent Clients Against a Blocking Module Method",
         "Running Modules with the logoscore Daemon",
+        "Running logoscore as a System Service, Shared with an OS Group (Linux)",
         "Reaching the logoscore Daemon over TCP and TCP+TLS"
       ]
     },
@@ -226,7 +258,8 @@
       "name": "logos-evm-wallet-ui",
       "label": "EVM Wallet UI",
       "tutorials": [
-        "Driving the Wallet UI App Headlessly"
+        "Driving the Wallet UI App Headlessly",
+        "Wallet UI end-to-end: configure a network, import, unlock, send"
       ]
     },
     {
