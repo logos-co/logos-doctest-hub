@@ -263,6 +263,34 @@
       ]
     },
     {
+      "name": "logos-monero-node-module",
+      "label": "Monero Node Module",
+      "tutorials": [
+        "monero_node_module against a public stagenet node"
+      ]
+    },
+    {
+      "name": "logos-monero-wallet-core-module",
+      "label": "Monero Wallet Engine",
+      "tutorials": [
+        "monero_wallet_core_module creates and syncs a stagenet wallet"
+      ]
+    },
+    {
+      "name": "logos-monero-wallet-cli",
+      "label": "Monero Wallet CLI",
+      "tutorials": [
+        "monero_wallet_cli — a headless Monero wallet over logosctl, both roles in one session"
+      ]
+    },
+    {
+      "name": "logos-monero-wallet-ui",
+      "label": "Monero Wallet UI",
+      "tutorials": [
+        "monero_wallet_ui — create a stagenet wallet and receive into it, in one app"
+      ]
+    },
+    {
       "name": "logos-storage-module",
       "label": "Storage Module",
       "tutorials": [
